@@ -12,8 +12,7 @@ Require-Bundle: org.eclipse.ui.workbench,
  org.eclipse.core.resources;bundle-version="3.13.600",
  org.eclipse.debug.ui;bundle-version="3.14.300",
  org.eclipse.jface.text;bundle-version="3.16.100"
-Bundle-RequiredExecutionEnvironment: JavaSE-13,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-13
 Automatic-Module-Name: eclipse-monitor-kits-plugin;singleton:=true
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.core.resources,
@@ -27,4 +26,8 @@ Bundle-ClassPath: .,
  lib/json-lib-2.4-jdk15.jar
 Export-Package: cn.edu.szu.entity,
  cn.edu.szu.listener,
- cn.edu.szu.monitor
+ cn.edu.szu.monitor,
+ cn.edu.szu.translator,
+ cn.edu.szu.translator.util,
+ cn.edu.szu.translator.view,
+ cn.edu.szu.util

@@ -5,6 +5,9 @@ public class PerspectiveEntity {
 	private String label;
 	private String description;
 	private int times ;
+	public PerspectiveEntity() {
+		times = 1;
+	}
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub

@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.Date;
 
@@ -53,6 +55,7 @@ import org.osgi.framework.BundleContext;
 
 import cn.edu.szu.entity.FileEntity;
 import cn.edu.szu.entity.KeyBindingEntity;
+import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.entity.SessionEntity;
 import cn.edu.szu.listener.CustomBreakpointListener;
 import cn.edu.szu.listener.CustomBreakpointsListener;
@@ -127,6 +130,7 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 		logInstance = getLog();
 		if(DebugPlugin.getDefault()!=null)
 			breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
+		workspace = ResourcesPlugin.getWorkspace();
 		actionManager = new CustomActionManager();
 		actionManager.init();
 		
@@ -138,12 +142,19 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 		//记录会话开始时间
 		session.setStartTime(new Date());		
 		
+		session.getLogger().push(new RecordEntity("Workbench,Start",2,"工作台已启动。" ,""));
+		session.getLogger().push(new RecordEntity("Plugin,Start",2,"插件“eclipse-monitor-kits-plugin” 已启动。",""));
+		
+		// 测试用，将控制台输出从定向到文件中
+//		FileOutputStream fos = new FileOutputStream("C:\\Users\\10190\\Desktop\\Monitor-log.txt");
+//		PrintStream ps = new PrintStream(fos);
+//		System.setOut(ps);
 	}
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
-
+		session.getLogger().push(new RecordEntity("Plugin,close",2,"插件“eclipse-monitor-kits-plugin” 已关闭。",""));
 	}
 	/**
 	 * Returns the shared instance
@@ -257,17 +268,26 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
     				addEditorListener(editor);
     				if(input instanceof FileEditorInput) {
     					IFile ifile = ((FileEditorInput)input).getFile();
-    					if(session.isFileExist( ifile.getLocation().toString() ) ){
-    						FileEntity file_entity = session.getFile( ifile.getLocation().toString() ) ;
-    						file_entity.setLastActivedTime(new Date());
-    					}else {
-    						FileEntity file_entity = new FileEntity();
-    						file_entity.setPath(ifile.getLocation().toString());
-    						file_entity.setProjectName(ifile.getProject().getName());
-    						file_entity.setName(ifile.getName());
-    						file_entity.setLastModifiedTime(new Date());
-    						file_entity.setLastActivedTime(new Date());
-    						session.push(file_entity);;
+    					if(ifile.getName().endsWith(".java")) {
+        					if(session.isFileExist( ifile.getLocation().toString() ) ){
+        						FileEntity file_entity = session.getFile( ifile.getLocation().toString() ) ;
+        						file_entity.setLastActivedTime(new Date());
+        					}else {
+        						FileEntity file_entity = new FileEntity();
+        						file_entity.setPath(ifile.getLocation().toString());
+        						file_entity.setProjectName(ifile.getProject().getName());
+        						file_entity.setName(ifile.getName());
+        						file_entity.setLastModifiedTime(new Date());
+        						file_entity.setLastActivedTime(new Date());
+    							try {
+    								file_entity.setRows(Monitor.countFileRows(file_entity.toFile()));
+    								file_entity.setBranks(Monitor.countFileBlanks(file_entity.toFile()));
+    								file_entity.setComments(Monitor.countFileComments(file_entity.toFile()));
+    							} catch (IOException e) {
+    								e.printStackTrace();
+    							}
+        						session.push(file_entity);;
+        					}
     					}
     				}else if(input instanceof IURIEditorInput) {
     					System.out.println("IURIEditorInput");
@@ -285,8 +305,6 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
     				}else if(input instanceof IInPlaceEditorInput) {
     					System.out.println("IInPlaceEditorInput");
     				}
-//    				QueryDialog dia = new QueryDialog(Display.getCurrent().getActiveShell());
-//    				dia.open();
                 }
 			}
 		});
@@ -366,19 +384,18 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
         ((StyledText)part.getAdapter(Control.class)).addMouseMoveListener(mouseListener);
         ((StyledText)part.getAdapter(Control.class)).addMouseListener(mouseListener);
         ((StyledText)part.getAdapter(Control.class)).addKeyListener(keyListener);
-        ((StyledText)part.getAdapter(Control.class)).addBidiSegmentListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addCaretListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addExtendedModifyListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addLineBackgroundListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addLineStyleListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addModifyListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addPaintObjectListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addSelectionListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addVerifyKeyListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addVerifyListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addWordMovementListener(textEditorListener);
-        ((StyledText)part.getAdapter(Control.class)).addMouseWheelListener(textEditorListener);
-//        ((StyledText)part.getAdapter(Control.class)).add
+//        ((StyledText)part.getAdapter(Control.class)).addBidiSegmentListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addCaretListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addExtendedModifyListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addLineBackgroundListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addLineStyleListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addModifyListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addPaintObjectListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addSelectionListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addVerifyKeyListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addVerifyListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addWordMovementListener(textEditorListener);
+//        ((StyledText)part.getAdapter(Control.class)).addMouseWheelListener(textEditorListener);
     }
     public static void removeEditorListener(IEditorPart part) {
 //       	System.out.println("removeEditorListener");
@@ -387,18 +404,18 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
    	 	((StyledText)part.getAdapter(Control.class)).removeMouseMoveListener(mouseListener);
     	((StyledText)part.getAdapter(Control.class)).removeMouseListener(mouseListener);
     	((StyledText)part.getAdapter(Control.class)).removeKeyListener(keyListener);
-    	((StyledText)part.getAdapter(Control.class)).removeBidiSegmentListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeCaretListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeExtendedModifyListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeLineBackgroundListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeLineStyleListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeModifyListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removePaintObjectListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeSelectionListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeVerifyKeyListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeVerifyListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeWordMovementListener(textEditorListener);
-    	((StyledText)part.getAdapter(Control.class)).removeMouseWheelListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeBidiSegmentListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeCaretListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeExtendedModifyListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeLineBackgroundListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeLineStyleListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeModifyListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removePaintObjectListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeSelectionListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeVerifyKeyListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeVerifyListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeWordMovementListener(textEditorListener);
+//    	((StyledText)part.getAdapter(Control.class)).removeMouseWheelListener(textEditorListener);
     }
     public static void add(IViewPart view) {
     	((ViewForm)view.getAdapter(Control.class)).addMouseListener(mouseListener);

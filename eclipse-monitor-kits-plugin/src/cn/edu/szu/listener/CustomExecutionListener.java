@@ -31,6 +31,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import cn.edu.szu.entity.CodingEntity;
 import cn.edu.szu.entity.CommandEntity;
 import cn.edu.szu.entity.FileEntity;
+import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.entity.SessionEntity;
 import cn.edu.szu.monitor.Monitor;
 
@@ -110,5 +111,6 @@ public class CustomExecutionListener implements IExecutionListener {
 			e1.printStackTrace();
 		}
 		session.push(command);
+		session.getLogger().push(new RecordEntity("Command",3,"÷¥––√¸¡Ó£∫"+command.getName(),""));
     }
 }

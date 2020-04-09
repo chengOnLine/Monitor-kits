@@ -17,7 +17,6 @@ public class CustomKeyListener implements KeyListener {
 		// TODO Auto-generated method stub
 //		System.out.println("keyPressed");
 		//Ìí¼ÓCoding¶¯×÷
-
 		Monitor.actionManager.keyStrokes++;
 		if(Monitor.actionManager.firstKey == null) {
 			Monitor.actionManager.firstKey = new Date();
@@ -33,10 +32,6 @@ public class CustomKeyListener implements KeyListener {
 				}
 			}
 		}
-//		System.out.println("KeyEvent (Time: "+e.time+ ", character:"+ e.character +", keyCode:"+e.keyCode +", location:"+e.keyLocation +", mask:"+e.stateMask+" )");
-//		if(e.stateMask == SWT.CTRL) {
-//			System.out.println("CTRL + "+e.character);
-//		}
 	}
 
 	@Override

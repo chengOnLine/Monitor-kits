@@ -15,15 +15,16 @@ public class SessionEntity {
 	private Date startTime;
 	private Date endTime;
 	private Long sessionTime;
+	private TrackLogEntity logger;
 	private ArrayList<ActionEntity> actions;
 	private ArrayList<CommandEntity> commands;
 	private ArrayList<FileEntity> files;
 	private PreferenceEntity preference;
 	private ArrayList<ErrorEntity> errors;
-//	private ArrayList<WarnEntity> warns;
 	private ArrayList<KeyBindingEntity> keyBinds;
 	
 	public SessionEntity() {
+		logger = new TrackLogEntity();
 		actions = new ArrayList<ActionEntity>();
 		commands = new ArrayList<CommandEntity>();
 		files = new ArrayList<FileEntity>();
@@ -36,7 +37,6 @@ public class SessionEntity {
 		JsonConfig jc = new JsonConfig();
 		jc.registerJsonValueProcessor(Date.class, new DateJsonValueProcessor());
 		JSONObject json = JSONObject.fromObject(this,jc);
-//		JSONArray json = JSONArray.fromObject(files,jc);
 		System.out.println(json);
 		return json.toString();
 	}
@@ -101,12 +101,6 @@ public class SessionEntity {
 	public void setErrors(ArrayList<ErrorEntity> errors) {
 		this.errors = errors;
 	}
-//	public ArrayList<WarnEntity> getWarns() {
-//		return warns;
-//	}
-//	public void setWarns(ArrayList<WarnEntity> warns) {
-//		this.warns = warns;
-//	}
 	public boolean isFileExist(String path) {
 		for(FileEntity file :files) {
 			if(file.getPath().equals(path)) {
@@ -180,5 +174,15 @@ public class SessionEntity {
 			actions.add(se);
 		}
 		
+	}
+
+	public TrackLogEntity getLogger() {
+		if(logger == null)
+			logger = new TrackLogEntity();
+		return logger;
+	}
+
+	public void setLogger(TrackLogEntity logger) {
+		this.logger = logger;
 	}
 }

@@ -25,7 +25,7 @@
       <view
             category="Translate"
             class="cn.edu.szu.translator.view.TranslateView"
-            icon="icons/translate.jpg"
+            icon="icons/menu.png"
             id="cn.edu.szu.translateView"
             name="百度翻译"
             restorable="true">

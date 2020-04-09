@@ -1,6 +1,9 @@
 package cn.edu.szu.translator.view;
 
+import java.awt.Image;
 import java.io.UnsupportedEncodingException;
+
+import javax.swing.ImageIcon;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -50,7 +53,7 @@ public class QueryDialog extends Dialog{
 		  int y = bounds.y + (bounds.height - rect.height) / 2 - 50;
 		  shell.setText("百度翻译小助手");
 		  shell.setLocation (x, y);
-		  shell.setImage(Monitor.getImageDescriptor("/icons/menu.png").createImage());
+		  shell.setImage(Monitor.getImageDescriptor("./icons/menu.png").createImage());
 		  /*布局开始*/
 		  Composite composite = new Composite(parent, SWT.NONE);
 		  GridLayout layout = new GridLayout(3, false);

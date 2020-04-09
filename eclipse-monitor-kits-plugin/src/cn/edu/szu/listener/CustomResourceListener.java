@@ -15,6 +15,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Display;
 
+import cn.edu.szu.entity.RecordEntity;
+import cn.edu.szu.entity.SessionEntity;
+import cn.edu.szu.monitor.Monitor;
+
 public class CustomResourceListener implements IResourceChangeListener {
 	private TableViewer table; //assume this gets initialized somewhere  
     private static final IPath DOC_PATH = new Path("D:\\eclipse-workplaces\\eclipse-rcp_plugin-workplace\\demo1\\src");  
@@ -22,57 +26,54 @@ public class CustomResourceListener implements IResourceChangeListener {
 	public void resourceChanged(IResourceChangeEvent event) {
 		// TODO Auto-generated method stub
 //		String strs[] = {"","POST_CHANGE","PRE_CLOSE","PRE_DELETE","PRE_DELETE"};
-//		System.out.println("resourceChanged");
-//		System.out.println("event.type = "+ strs[event.getType()]);
-		
-        //we are only interested in POST_CHANGE events  
-//        if (event.getType() != IResourceChangeEvent.POST_CHANGE)  
-//           return;  
-//        IResourceDelta rootDelta = event.getDelta();  
-//        //get the delta, if any, for the documentation directory  
-//        IResourceDelta docDelta = rootDelta.findMember(DOC_PATH);  
-//        if (docDelta == null) {  
-//        	System.out.println("docDelta is null");
-//        	return;  
-//        }
-//        final ArrayList changed = new ArrayList();  
-//        IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {  
-//           public boolean visit(IResourceDelta delta) {  
-//              //only interested in changed resources (not added or removed)  
-//              if (delta.getKind() != IResourceDelta.CHANGED)  
-//                 return true;  
-//              //only interested in content changes  
-//              if ((delta.getFlags() & IResourceDelta.CONTENT) == 0)  
-//                 return true;  
-//              IResource resource = delta.getResource();  
-//              //only interested in files with the "txt" extension  
-//              if (resource.getType() == IResource.FILE &&   
-//               "txt".equalsIgnoreCase(resource.getFileExtension())) {  
-//                 changed.add(resource);  
-//              }  
-//              return true;  
-//           }  
-//        };  
-//        try {  
-//           docDelta.accept(visitor);  
-//        } catch (CoreException e) {  
-//           //open error dialog with syncExec or print to plugin log file  
-//        }  
-//        //nothing more to do if there were no changed text files  
-//        if (changed.size() == 0)  
-//           return;  
-//        //post this update to the table  
-//        Display display = table.getControl().getDisplay();  
-//        if (!display.isDisposed()) {  
-//           display.asyncExec(new Runnable() {  
-//              public void run() {  
-//                 //make sure the table still exists  
-//                 if (table.getControl().isDisposed())  
-//                    return;  
-//                 table.update(changed.toArray(), null);  
-//              }  
-//           });  
-//        }  
+//		System.out.print("resourceChanged" +"  ");
+        if (event.getType() != IResourceChangeEvent.POST_CHANGE)  
+           return;  
+        IResourceDelta rootDelta = event.getDelta();  
+        IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {  
+           public boolean visit(IResourceDelta delta) {  
+//        	  System.out.println("IResourceDelta.getKind:"+ delta.getKind());
+        	  SessionEntity session = Monitor.session;
+        	  if(delta.getKind() == IResourceDelta.ADDED) {
+//        		  System.out.println("ADD");
+        		  IResource s = delta.getResource();
+//        		  System.out.println("name:"+s.getName());
+//        		  System.out.println("projectName:"+s.getProject().getName());
+//        		  System.out.println("location:"+s.getLocation());
+//        		  System.out.println("fullPath::"+s.getFullPath());
+        		  if(s!=null) {
+        			  if(s.getName().equals( s.getFullPath().toString().substring(1) )) {
+        				  session.getLogger().push(new RecordEntity("NewProject",1,"新建工程："+s.getName() ,""));
+            		  }else {
+            			  if(s.getType() == IResource.FILE && ("java".equalsIgnoreCase(s.getFileExtension()) || "class".equalsIgnoreCase(s.getFileExtension()))  ) {
+            				  session.getLogger().push(new RecordEntity("NewFile",1,"新建文件："+s.getName() +",当前工程为："+s.getProject().getName() , ""));
+            			  }
+            		  }
+        		  }
+        	  }else if(delta.getKind() == IResourceDelta.REMOVED){
+//        		  System.out.println("remove");
+        		  IResource s = delta.getResource();
+//        		  System.out.println("name:"+s.getName());
+//        		  System.out.println("projectName:"+s.getProject().getName());
+//        		  System.out.println("location:"+s.getLocation());
+//        		  System.out.println("fullPath::"+s.getFullPath());
+        		  if(s!=null) {
+        			  if(s.getName().equals( s.getFullPath().toString().substring(1) )) {
+        				  session.getLogger().push(new RecordEntity("DeleteProject",1,"删除工程："+s.getName() ,""));
+            		  }else {
+            			  if(s.getType() == IResource.FILE && ("java".equalsIgnoreCase(s.getFileExtension()) || "class".equalsIgnoreCase(s.getFileExtension()))  ) {
+            				  session.getLogger().push(new RecordEntity("DeleteFIle",1,"删除文件："+s.getName()+",当前工程为："+s.getProject().getName() ,""));
+            			  }
+            		  }
+        		  }
+        	  }
+              return true;
+           }  
+        };  
+        try {  
+        	rootDelta.accept(visitor);  
+        } catch (CoreException e) {  
+        }    
 	}
 
 }

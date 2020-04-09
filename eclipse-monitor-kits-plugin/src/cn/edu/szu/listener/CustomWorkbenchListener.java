@@ -8,6 +8,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchWindow;
 
+import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.entity.SessionEntity;
 import cn.edu.szu.entity.SleepingEntity;
 import cn.edu.szu.monitor.Monitor;
@@ -34,23 +35,26 @@ public class CustomWorkbenchListener implements IWindowListener, IWorkbenchListe
 		
 		String filePath =Platform.getLocation().toString();
 		String fileName = "session";
+		
+		session.getLogger().push(new RecordEntity("Workbench,Close",2,"工作台已关闭",""));
 		System.out.println( CreateFileUtil.createJsonFile(Monitor.session.toJsonStr(), filePath, fileName)==true? "create success" : "create fail");
-//		CreateFileUti
+	
 	}
 	@Override
 	public void windowActivated(IWorkbenchWindow window) {
 		// TODO Auto-generated method stub
-		System.out.println("windowActivated");
+//		System.out.println("windowActivated");
 		Monitor.actionManager.finishTime = new Date();
 		SleepingEntity sleep = Monitor.actionManager.createSleeping();
 		if(sleep!=null) {
 			Monitor.session.push(sleep);
+			Monitor.session.getLogger().push(new RecordEntity("Sleep",3,"睡眠时间，时长：" +(sleep.getEndTime().getTime()-sleep.getStartTime().getTime())/1000 +"s",""));
 		}
 	}
 	@Override
 	public void windowDeactivated(IWorkbenchWindow window) {
 		// TODO Auto-generated method stub
-		System.out.println("windowDeactivated");
+//		System.out.println("windowDeactivated");
 		Monitor.actionManager.beginTime = new Date();
 	}
 	@Override

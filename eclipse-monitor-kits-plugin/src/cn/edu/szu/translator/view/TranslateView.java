@@ -48,7 +48,6 @@ public class TranslateView extends ViewPart {
 		// TODO Auto-generated method stub
 		display = Display.getDefault();
 		inputText = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.WRAP| SWT.V_SCROLL);
-//		inputText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		inputText.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {
@@ -59,7 +58,11 @@ public class TranslateView extends ViewPart {
 				}
 			}
 		});
-		
+
+		resultText = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI | SWT.WRAP| SWT.V_SCROLL);
+		resultText.setText("" + System.getProperty("line.separator") + 
+			  		""+ System.getProperty("line.separator") + 
+			  		""+ System.getProperty("line.separator") +"");
 //		clear = new Button(parent, SWT.COLOR_CYAN | SWT.FLAT);
 //		clear.setFont(new Font(display, new FontData("", 15, SWT.NO)));
 //		clear.setText("clear");
@@ -76,18 +79,11 @@ public class TranslateView extends ViewPart {
 //
 //			}
 //		});
-
-		resultText = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI | SWT.WRAP| SWT.V_SCROLL);
-		resultText.setText("" + System.getProperty("line.separator") + 
-			  		""+ System.getProperty("line.separator") + 
-			  		""+ System.getProperty("line.separator") +"");
-//		resultText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 	private void doTranslate(final String src) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
 					Message msg = translator.translate(src);
 					display.asyncExec(new Runnable() {
