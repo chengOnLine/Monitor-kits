@@ -46,6 +46,20 @@
             </command>
          </toolbar>
       </menuContribution>
+      
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="cn.edu.szu.monitor.toolbar">
+            <command
+                  commandId="cn.edu.szu.monitor.popupActionCommand"
+                  icon="icons/monitor.png"
+                  style="push"
+                  tooltip="监听器">
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -57,6 +71,17 @@
             <parameter
                   name="WordsTranslation.parameter1"
                   value="WordsTranslation.parameter1">
+            </parameter>
+         </defaultHandler>
+      </command>
+      <command
+            id="cn.edu.szu.monitor.popupActionCommand"
+            name="Monitor">
+         <defaultHandler
+               class="cn.edu.szu.util.OpenDialogHandler">
+            <parameter
+                  name="Monitor.parameter1"
+                  value="Monitor.parameter1">
             </parameter>
          </defaultHandler>
       </command>
