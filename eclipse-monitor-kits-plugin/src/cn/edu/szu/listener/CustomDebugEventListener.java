@@ -16,9 +16,7 @@ public class CustomDebugEventListener implements IDebugEventSetListener {
 //		System.out.println("handleDebugEvents");
 		SessionEntity session = Monitor.session;
 		if(Monitor.actionManager == null) return;
-		System.out.println("------------start-----------");
 		for(DebugEvent e : events) {
-			System.out.println(e.toString());
 			String className = e.getSource().getClass().getName();
 			if(className.equals("org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget")) {
 				if(e.getKind() == DebugEvent.TERMINATE) {
@@ -27,17 +25,17 @@ public class CustomDebugEventListener implements IDebugEventSetListener {
 					if(debug != null) {
 						Monitor.session.push(debug);
 					}
-					session.getLogger().push(new RecordEntity("Debug,Terminal",1,"Debug结束",""));
+					session.getLogger().push(new RecordEntity("Debug,Terminal",3,"调试结束",""));
 				}else if(e.getKind() == DebugEvent.CREATE) {
 					Monitor.actionManager.activeProject = Monitor.getActiveProject() ==null ? "" : Monitor.getActiveProject().getName();
 					Monitor.actionManager.launchingTime = new Date();
-					session.getLogger().push(new RecordEntity("Debug,Create",1,"Debug启动，当前工程为："+Monitor.actionManager.activeProject,""));
+					session.getLogger().push(new RecordEntity("Debug,Create",3,"开始调试",""));
 				}
 			}else if(className.equals("org.eclipse.debug.core.model.RuntimeProcess")) {
 				if(e.getKind() == DebugEvent.TERMINATE) {
-					session.getLogger().push(new RecordEntity("Run,Create",1,"运行项目，当前工程为："+Monitor.getActiveProject(),""));
+					session.getLogger().push(new RecordEntity("Run,Create",1,"项目运行结束",""));
 				}else if(e.getKind() == DebugEvent.CREATE) {
-					session.getLogger().push(new RecordEntity("Run,Terminal",1,"运行结束",""));
+					session.getLogger().push(new RecordEntity("Run,Terminal",1,"开始运行项目",""));
 				}
 			}else if(className.equals("org.eclipse.jdt.internal.debug.core.model.JDIThread")) {
 				
@@ -45,7 +43,6 @@ public class CustomDebugEventListener implements IDebugEventSetListener {
 				
 			}
 		}
-		System.out.println("------------end-----------");
 	}
 
 }

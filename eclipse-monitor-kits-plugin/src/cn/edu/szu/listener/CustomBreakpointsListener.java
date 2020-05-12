@@ -6,6 +6,7 @@ import org.eclipse.debug.core.IBreakpointsListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 
+import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.monitor.Monitor;
 
 public class CustomBreakpointsListener implements IBreakpointsListener {
@@ -18,6 +19,7 @@ public class CustomBreakpointsListener implements IBreakpointsListener {
 		for(IBreakpoint point:breakpoints) {
 			try {
 				System.out.println("breakpoint :"+ Monitor.pointToString(point));
+				Monitor.session.getLogger().push(new RecordEntity("BreakPoint",3,"Ìí¼Ó¶Ïµã£º"+point.getModelIdentifier(),""));
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -33,6 +35,7 @@ public class CustomBreakpointsListener implements IBreakpointsListener {
 		for(IBreakpoint point:breakpoints) {
 			try {
 				System.out.println("breakpoint :"+ Monitor.pointToString(point));
+				Monitor.session.getLogger().push(new RecordEntity("BreakPoint",3,"É¾³ý¶Ïµã£º"+point.getModelIdentifier(),""));
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

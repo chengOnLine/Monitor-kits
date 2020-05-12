@@ -1,5 +1,6 @@
 package cn.edu.szu.listener;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
@@ -7,8 +8,10 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 
 import cn.edu.szu.entity.CodingEntity;
+import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.monitor.CustomActionManager;
 import cn.edu.szu.monitor.Monitor;
+import cn.edu.szu.util.Const;
 
 public class CustomKeyListener implements KeyListener {
 
@@ -26,6 +29,7 @@ public class CustomKeyListener implements KeyListener {
 			if((currentTime - preTime) <= CustomActionManager.silentTime) {
 				Monitor.actionManager.preKey = new Date(currentTime);;
 			}else {
+				SimpleDateFormat sdf = new SimpleDateFormat(Const.dateFormat1);
 				CodingEntity coding = Monitor.actionManager.createCoding();
 				if(coding !=null) {
 					Monitor.session.push(coding);

@@ -15,7 +15,7 @@ public class OpenDialogHandler extends AbstractHandler{
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		QueryDialog dialog = new QueryDialog(Display.getCurrent().getActiveShell());
 		dialog.open();
-		Monitor.session.getLogger().push(new RecordEntity("Translate",3,"换出便捷百度翻译窗口",""));
+		Monitor.session.getLogger().push(new RecordEntity("Translate",3,"唤出百度翻译窗口",""));
 		return null;
 	}
 

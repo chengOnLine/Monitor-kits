@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.monitor.Monitor;
 import cn.edu.szu.translator.Translator;
 import cn.edu.szu.translator.util.Message;
@@ -39,6 +40,7 @@ public class QueryDialog extends Dialog{
 	public QueryDialog(Shell parentShell) {
 		super(parentShell);
 		translator = new Translator();
+		Monitor.session.getLogger().push(new RecordEntity("Translate",3,"唤出翻译小工具", ""));
 //		createContents();
 	}
 

@@ -12,6 +12,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -34,6 +35,7 @@ import cn.edu.szu.entity.FileEntity;
 import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.entity.SessionEntity;
 import cn.edu.szu.monitor.Monitor;
+import cn.edu.szu.util.Const;
 
 public class CustomExecutionListener implements IExecutionListener {
 
@@ -55,7 +57,6 @@ public class CustomExecutionListener implements IExecutionListener {
 //    	System.out.println("postExecuteSuccess: "+ commandId);
     	SessionEntity session = Monitor.session;
     	 if (commandId.equals("org.eclipse.ui.file.save")) {
-    		 
              IWorkbench workbench = Monitor.workbench;
              if (workbench == null) return;
              IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
@@ -85,11 +86,12 @@ public class CustomExecutionListener implements IExecutionListener {
 					}
             	 }
              }
-             
+			SimpleDateFormat sdf = new SimpleDateFormat(Const.dateFormat1);
              // 记录Coding动作
              CodingEntity coding = Monitor.actionManager.createCoding();
              if(coding != null) {
             	 Monitor.session.push(coding);
+//            	 Monitor.session.getLogger().push(new RecordEntity("Edit",2,"编码行为("+sdf.format(coding.getStartTime())+"~" + sdf.format(coding.getEndTime())+"),时长"+ (coding.getEndTime().getTime()-coding.getStartTime().getTime())/1000 +"s , 字符数:"+coding.getKeyStrokes(),""));
              }
          }
     }

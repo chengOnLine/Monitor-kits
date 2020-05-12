@@ -3,8 +3,6 @@ package cn.edu.szu.entity;
 public class ViewEntity {
 	private String name;
 	private String id;
-	private String title;
-	private String titleToolTip;
 	private int  times ;
 	
 	@Override
@@ -23,18 +21,6 @@ public class ViewEntity {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getTitleToolTip() {
-		return titleToolTip;
-	}
-	public void setTitleToolTip(String titleToolTip) {
-		this.titleToolTip = titleToolTip;
 	}
 	public String getId() {
 		return id;

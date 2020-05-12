@@ -46,7 +46,7 @@ public class CustomResourceListener implements IResourceChangeListener {
         				  session.getLogger().push(new RecordEntity("NewProject",1,"新建工程："+s.getName() ,""));
             		  }else {
             			  if(s.getType() == IResource.FILE && ("java".equalsIgnoreCase(s.getFileExtension()) || "class".equalsIgnoreCase(s.getFileExtension()))  ) {
-            				  session.getLogger().push(new RecordEntity("NewFile",1,"新建文件："+s.getName() +",当前工程为："+s.getProject().getName() , ""));
+            				  session.getLogger().push(new RecordEntity("NewFile",1,"新建文件："+s.getName() +",所在项目："+s.getProject().getName() , ""));
             			  }
             		  }
         		  }
@@ -62,7 +62,7 @@ public class CustomResourceListener implements IResourceChangeListener {
         				  session.getLogger().push(new RecordEntity("DeleteProject",1,"删除工程："+s.getName() ,""));
             		  }else {
             			  if(s.getType() == IResource.FILE && ("java".equalsIgnoreCase(s.getFileExtension()) || "class".equalsIgnoreCase(s.getFileExtension()))  ) {
-            				  session.getLogger().push(new RecordEntity("DeleteFIle",1,"删除文件："+s.getName()+",当前工程为："+s.getProject().getName() ,""));
+            				  session.getLogger().push(new RecordEntity("DeleteFIle",1,"删除文件："+s.getName()+",所在项目："+s.getProject().getName() ,""));
             			  }
             		  }
         		  }

@@ -120,9 +120,11 @@ public class SessionEntity {
 
 	public String getTriggerSequence(String commandId) {
 		String sequence = null;
-		if(keyBinds == null || commandId == null || commandId =="") 
+		ArrayList<KeyBindingEntity> binds = Monitor.keybinds;
+		
+		if(binds == null || commandId == null || commandId =="") 
 			return "";
-		for(KeyBindingEntity bind : keyBinds) {
+		for(KeyBindingEntity bind : binds) {
 			if(bind.getCommandId()!=null && bind.getCommandId()!="") {
 				if(commandId.equals( bind.getCommandId() ))
 					sequence = bind.getTriggerSequence();

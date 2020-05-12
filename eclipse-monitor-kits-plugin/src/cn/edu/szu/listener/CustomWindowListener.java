@@ -16,6 +16,8 @@ public class CustomWindowListener implements IPageListener, IPerspectiveListener
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		// TODO Auto-generated method stub
 //		System.out.println("perspectiveActivated");
+		Monitor.session.getLogger().push(new RecordEntity("Perspective",3,"当前活动透视图:"+perspective.getLabel(), ""));
+
 	}
 
 	@Override
@@ -28,7 +30,7 @@ public class CustomWindowListener implements IPageListener, IPerspectiveListener
 		pe.setLabel(perspective.getLabel());
 		pe.setDescription(perspective.getDescription());
 		session.getPreference().push(pe);
-		session.getLogger().push(new RecordEntity("Perspective",4,"变换透视图，当前透视图为:"+perspective.getLabel() , ""));
+//		session.getLogger().push(new RecordEntity("Perspective",4,"变换透视图，当前透视图为:"+perspective.getLabel() , ""));
 	}
 
 	@Override

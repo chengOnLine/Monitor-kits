@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -53,6 +54,8 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.BundleContext;
 
+import cn.edu.szu.config.Configuration;
+import cn.edu.szu.config.User;
 import cn.edu.szu.entity.FileEntity;
 import cn.edu.szu.entity.KeyBindingEntity;
 import cn.edu.szu.entity.RecordEntity;
@@ -72,6 +75,9 @@ import cn.edu.szu.listener.CustomTextEditorListener;
 import cn.edu.szu.listener.CustomWindowListener;
 import cn.edu.szu.listener.CustomWorkbenchListener;
 import cn.edu.szu.translator.view.QueryDialog;
+import cn.edu.szu.util.ConnectionUtil;
+import cn.edu.szu.util.CreateFileUtil;
+import cn.edu.szu.util.ReadWriteFileUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -88,6 +94,7 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 	public static IBreakpointManager breakpointManager;
 	public static CustomActionManager actionManager;
 	public static  final IWorkbench workbench = PlatformUI.getWorkbench();
+	public static ArrayList<KeyBindingEntity> keybinds = new ArrayList<KeyBindingEntity>();
     public static boolean DEBUG = false;
     public static final Logger log = new Logger();
 //    public static IConsoleLineTracker iclt;
@@ -127,23 +134,60 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 		super.start(context);
 		plugin = this;
 		
+		//生成配置文件
+		CreateFileUtil.createConfigFile();
+		
+		//实例化
 		logInstance = getLog();
-		if(DebugPlugin.getDefault()!=null)
-			breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
+		breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
 		workspace = ResourcesPlugin.getWorkspace();
 		actionManager = new CustomActionManager();
-		actionManager.init();
 		
 		//实例化会话类
 		session = new SessionEntity();
-		session.setUserName("cheng");
+		session.setUserName("");
 		session.setSessionId("001");
 		
-		//记录会话开始时间
-		session.setStartTime(new Date());		
+		//自动登录线程
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Configuration config;
+				int times = 3;
+				while(times-- >0) {
+					try {
+						config = ReadWriteFileUtil.readConfig();
+						User user = config.getUser();
+						if(user == null || !config.getSetting().isAutoLogin())
+							break;
+						else {
+							if(user.isLogin() == true)
+								break;
+							String url = config.getSetting().getServerUrl()+":"+config.getSetting().getPort();
+							String result = ConnectionUtil.doGetLogin(url, user.getName(), user.getPassword());
+							if(result.equals("SUCCESS")) {
+								session.setUserName(user.getName());
+								user.setLogin(true);
+								ReadWriteFileUtil.writeConfig(config);
+								break;
+							}
+						}
+						Thread.sleep(1000*60);
+					}catch (IOException | InterruptedException e) {
+					
+					}
+				}
+			}
+		}).start();
 		
-		session.getLogger().push(new RecordEntity("Workbench,Start",2,"工作台已启动。" ,""));
-		session.getLogger().push(new RecordEntity("Plugin,Start",2,"插件“eclipse-monitor-kits-plugin” 已启动。",""));
+		
+		//记录会话开始时间
+		session.setStartTime(new Date());
+		
+		//记录轨迹
+		session.getLogger().push(new RecordEntity("Workbench,Start",1,"Eclipse 已启动。" ,""));
+		session.getLogger().push(new RecordEntity("Plugin,Start",1,"插件  'eclipse-monitor-kits-plugin' 已启动。",""));
 		
 		// 测试用，将控制台输出从定向到文件中
 //		FileOutputStream fos = new FileOutputStream("C:\\Users\\10190\\Desktop\\Monitor-log.txt");
@@ -154,7 +198,7 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
-		session.getLogger().push(new RecordEntity("Plugin,close",2,"插件“eclipse-monitor-kits-plugin” 已关闭。",""));
+		session.getLogger().push(new RecordEntity("Plugin,Close",1,"插件 'eclipse-monitor-kits-plugin' 已关闭。",""));
 	}
 	/**
 	 * Returns the shared instance
@@ -247,7 +291,7 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 									e.printStackTrace();
 								}
                 			}
-//                			session.getKeyBinds().add(bindEntity);
+                			keybinds.add(bindEntity);
                 		}
                 	}
                 }
@@ -348,9 +392,6 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
             	blanks++;
         }
         return blanks;
-        
-        
-        
     }
     public static int countFileComments(File file) throws IOException {
         BufferedReader input = new BufferedReader(new FileReader(file));
@@ -374,6 +415,7 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
             }
 
         }
+       
         return comments;
     }
     

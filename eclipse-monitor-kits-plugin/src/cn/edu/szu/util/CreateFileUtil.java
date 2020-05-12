@@ -5,12 +5,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+
+import org.eclipse.core.runtime.Platform;
+
+import cn.edu.szu.config.Configuration;
+import cn.edu.szu.config.Setting;
+import cn.edu.szu.config.User;
 
 public class CreateFileUtil {
-	public static boolean createJsonFile(String jsonString , String filePath , String fileName)  {
-		boolean flag = true;
+	public static String createJsonFile(String jsonString , String filePath , String fileName)  {
 		String fullPath = filePath + File.separator + fileName + ".json";
-		System.out.println("CreateFile, fullPath=" + fullPath);
 		File file = new File(fullPath);
 		if(!file.getParentFile().exists()) {
 			file.getParentFile().mkdirs();
@@ -47,11 +52,42 @@ public class CreateFileUtil {
 	        write.flush();
 	        write.close();
 		} catch (IOException e) {
-
 			e.printStackTrace();
-			flag = false;
+			return "";
 		}
-	    return flag;
-		
+		System.out.println("CreateFile, fullPath=" + fullPath);
+	    return fullPath;
+	}
+	public static void createConfigFile() throws IOException {
+		String path = Platform.getLocation()+File.separator+"config";
+		String fileName = "monitor-config";
+		File f = new File(path);
+		if(!f.exists()) {
+			f.mkdirs();
+		}
+		File file = new File(path+File.separator + fileName +".json");
+		if( !file.exists()) {
+			file.createNewFile();
+			Configuration config = new Configuration();
+			config.setVersion("1.0");
+			config.setLastDownloadTime("");
+			
+			Setting setting = new Setting();
+			setting.setAutoLogin(false);
+			setting.setAutoUpload(false);
+			setting.setServerUrl("http://192.168.182.1");
+			setting.setDownloadpath(Platform.getLocation()+File.separator+"report");
+			setting.setPort("8080");
+			setting.setTheme("默认");
+			config.setSetting(setting);
+			
+			
+			String p = createJsonFile(config.toJson(),path,fileName);
+			if(!p.equals("")) {
+				System.out.println("配置文件已生成。 "+ file.getAbsolutePath());
+			}else {
+				System.out.println("配置文件生成失败。");
+			}
+		}
 	}
 }

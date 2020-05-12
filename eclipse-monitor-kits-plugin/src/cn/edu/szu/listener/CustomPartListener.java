@@ -3,6 +3,7 @@ package cn.edu.szu.listener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle.Control;
 
@@ -30,6 +31,7 @@ import cn.edu.szu.entity.RecordEntity;
 import cn.edu.szu.entity.SessionEntity;
 import cn.edu.szu.entity.ViewEntity;
 import cn.edu.szu.monitor.Monitor;
+import cn.edu.szu.util.Const;
 
 public class CustomPartListener implements IPartListener2 {
 	 @Override
@@ -41,10 +43,9 @@ public class CustomPartListener implements IPartListener2 {
 			ViewEntity ve = new ViewEntity();
 			ve.setName(partRef.getPartName());
 			ve.setId(partRef.getId());
-			ve.setTitle(partRef.getTitle());
-			ve.setTitleToolTip(partRef.getTitleToolTip());
 			ve.setTimes(1);
 			session.getPreference().push(ve);
+			session.getLogger().push(new RecordEntity("Views",3,"当前活动视图:"+ve.getId(),""));
 
 			//更新文件组信息
 			if(partRef.getPart(true) == null ) return;
@@ -59,12 +60,12 @@ public class CustomPartListener implements IPartListener2 {
 						if(session.isFileExist( ifile.getLocation().toString() ) ){
 							FileEntity file_entity = session.getFile( ifile.getLocation().toString() ) ;
 							file_entity.setLastActivedTime(new Date());
+//							System.out.println(file_entity.getName()+": "+ new SimpleDateFormat(Const.defaultDateFormat).format(file_entity.getLastActivedTime()));
 						}else {
 							FileEntity file_entity = new FileEntity();
 							file_entity.setPath(ifile.getLocation().toString());
 							file_entity.setProjectName(ifile.getProject().getName());
 							file_entity.setName(ifile.getName());
-							file_entity.setLastModifiedTime(new Date());
 							file_entity.setLastActivedTime(new Date());
 							try {
 								file_entity.setRows(Monitor.countFileRows(file_entity.toFile()));
@@ -73,9 +74,9 @@ public class CustomPartListener implements IPartListener2 {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-							session.push(file_entity);;
+							session.push(file_entity);
+							session.getLogger().push(new RecordEntity("Edit",3,"编辑文件: "+file_entity.getName(),""));
 						}
-						session.getLogger().push(new RecordEntity("Edit",3,"编辑文件："+ifile.getName(),""));
 					}
 				}else if(input instanceof IURIEditorInput) {
 					System.out.println("IURIEditorInput");
@@ -88,7 +89,7 @@ public class CustomPartListener implements IPartListener2 {
 						System.out.println("name:"+name);
 						Monitor.actionManager.source = name;
 						Monitor.actionManager.startTime = new Date();
-						session.getLogger().push(new RecordEntity("Brows",3,"浏览类声明："+ipei.getName(),""));
+//						session.getLogger().push(new RecordEntity("Brows",2,"浏览类定义："+ipei.getName(),""));
 					}
 					
 				}else if(input instanceof IStorageEditorInput) {
@@ -113,36 +114,39 @@ public class CustomPartListener implements IPartListener2 {
 			if(partRef.getPart(true) instanceof IEditorPart) {
 				IEditorPart editor = (IEditorPart)partRef.getPart(true);
 				Monitor.removeEditorListener(editor);
-				
+				SimpleDateFormat sdf = new SimpleDateFormat(Const.dateFormat1);
 				//添加Coding动作
 				CodingEntity coding = Monitor.actionManager.createCoding();
 				if(coding !=null) {
 					Monitor.session.push(coding);
+//					Monitor.session.getLogger().push(new RecordEntity("Edit",2,"编码行为("+sdf.format(coding.getStartTime())+"~" + sdf.format(coding.getEndTime())+"),时长"+ (coding.getEndTime().getTime()-coding.getStartTime().getTime())/1000 +"s , 字符数:"+coding.getKeyStrokes(),""));
 				}
 				
 				IEditorInput input = editor.getEditorInput();
 				if(input instanceof FileEditorInput) {
-					IFile ifile = ((FileEditorInput)input).getFile();
-					if(ifile.getName().endsWith(".java")) {
-						FileEntity file_entity = session.getFile(ifile.getLocation().toString());
-						if( file_entity !=null && file_entity.getLastActivedTime()!=null) {
-							long time = file_entity.getTime() + (new Date().getTime() - file_entity.getLastActivedTime().getTime());
-							file_entity.setTime(time);
-						}
-					}
+//					IFile ifile = ((FileEditorInput)input).getFile();
+//					if(ifile.getName().endsWith(".java")) {
+//						FileEntity file_entity = session.getFile(ifile.getLocation().toString());
+//						if( file_entity !=null && file_entity.getLastActivedTime()!=null) {
+//							long currentTime = new Date().getTime();
+//							long time = file_entity.getTime() + (currentTime - file_entity.getLastActivedTime().getTime());
+//							System.out.println(file_entity.getName()+": "+file_entity.getTime() +"add" + (currentTime - file_entity.getLastActivedTime().getTime() ));
+//							file_entity.setTime(time);
+//						}
+//					}
 				}else if(input instanceof IURIEditorInput) {
 					System.out.println("IURIEditorInput");
 				}else if(input instanceof IPathEditorInput) {
-					System.out.println("IPathEditorInput");
-					IPathEditorInput ipei = (IPathEditorInput)input;
-					if(ipei.getName().endsWith(".class")) {
-						// 记录Browsing行为
-						Monitor.actionManager.endTime = new Date();
-						BrowsingEntity brow = Monitor.actionManager.createBrowsing();
-						if(brow !=null) {
-							Monitor.session.push(brow);
-						}
-					}
+//					System.out.println("IPathEditorInput");
+//					IPathEditorInput ipei = (IPathEditorInput)input;
+//					if(ipei.getName().endsWith(".class")) {
+//						// 记录Browsing行为
+//						Monitor.actionManager.endTime = new Date();
+//						BrowsingEntity brow = Monitor.actionManager.createBrowsing();
+//						if(brow !=null) {
+//							Monitor.session.push(brow);
+//						}
+//					}
 				}else if(input instanceof IStorageEditorInput) {
 					System.out.println("IStorageEditorInput");
 				}else if(input instanceof IInPlaceEditorInput) {
@@ -161,40 +165,45 @@ public class CustomPartListener implements IPartListener2 {
 				IEditorPart editor = (IEditorPart)partRef.getPart(true);
 		    	//为编辑器移除监听器
 				Monitor.removeEditorListener(editor);
-				
+				SimpleDateFormat sdf = new SimpleDateFormat(Const.dateFormat1);
 				//添加Coding动作
 				CodingEntity coding = Monitor.actionManager.createCoding();
 				if(coding !=null) {
 					Monitor.session.push(coding);
+//					Monitor.session.getLogger().push(new RecordEntity("Edit",2,"编码行为("+sdf.format(coding.getStartTime())+"~" + sdf.format(coding.getEndTime())+"),时长"+ (coding.getEndTime().getTime()-coding.getStartTime().getTime())/1000 +"s , 字符数:"+coding.getKeyStrokes(),""));
 				}
 				IEditorInput input = editor.getEditorInput();
 				if(input instanceof FileEditorInput) {
-					System.out.println("FileEditorInput");
+//					System.out.println("FileEditorInput");
 					IFile ifile = ((FileEditorInput)input).getFile();
 					if(ifile.getName().endsWith(".java")) {
 						FileEntity file_entity = session.getFile(ifile.getLocation().toString());
 						if( file_entity !=null && file_entity.getLastActivedTime()!=null) {
-							long time = file_entity.getTime() + (new Date().getTime() - file_entity.getLastActivedTime().getTime());
+							long currentTime = new Date().getTime();
+							long time = file_entity.getTime() + (currentTime - file_entity.getLastActivedTime().getTime());
+//							System.out.println(file_entity.getName()+": "+file_entity.getTime() +"add" + (currentTime - file_entity.getLastActivedTime().getTime() ));
 							file_entity.setTime(time);
 						}
 					}
 				}else if(input instanceof IURIEditorInput) {
-					System.out.println("IURIEditorInput");
+//					System.out.println("IURIEditorInput");
 				}else if(input instanceof IPathEditorInput) {
-					System.out.println("IPathEditorInput");
+//					System.out.println("IPathEditorInput");
 					IPathEditorInput ipei = (IPathEditorInput)input;
 					if(ipei.getName().endsWith(".class")) {
+						
 						// 记录Browsing行为
 						Monitor.actionManager.endTime = new Date();
 						BrowsingEntity brow = Monitor.actionManager.createBrowsing();
 						if(brow !=null) {
 							Monitor.session.push(brow);
+//							session.getLogger().push(new RecordEntity("Brows",2,"浏览("+sdf.format(brow.getStartTime())+"~"+sdf.format(brow.getEndTime())+"):"+brow.getSource()+",时长:"+(brow.getEndTime().getTime()-brow.getStartTime().getTime())/1000 +"s",""));
 						}
 					}
 				}else if(input instanceof IStorageEditorInput) {
-					System.out.println("IStorageEditorInput");
+//					System.out.println("IStorageEditorInput");
 				}else if(input instanceof IInPlaceEditorInput) {
-					System.out.println("IInPlaceEditorInput");
+//					System.out.println("IInPlaceEditorInput");
 				}
 			}
 	    }
@@ -217,15 +226,7 @@ public class CustomPartListener implements IPartListener2 {
 				
 				IEditorInput input = editor.getEditorInput();
 				if(input instanceof FileEditorInput) {
-					IFile ifile = ((FileEditorInput)input).getFile();
-					if(ifile.getName().endsWith(".java")) {
-						FileEntity file_entity = session.getFile(ifile.getLocation().toString());
-						if( file_entity !=null && file_entity.getLastActivedTime()!=null) {
-							long time = file_entity.getTime() + (new Date().getTime() - file_entity.getLastActivedTime().getTime());
-							System.out.print("time:"+time);
-							file_entity.setTime(file_entity.getTime() + (new Date().getTime() - file_entity.getLastActivedTime().getTime()));
-						}
-					}
+	
 				}
 			}
 	    }

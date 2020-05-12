@@ -9,16 +9,16 @@ public class CustomPropertyListener implements IPropertyListener , IPropertyChan
 	@Override
 	public void propertyChanged(Object source, int propId) {
 		// TODO Auto-generated method stub
-		System.out.println("propertyChanged1:" + source.toString() + "  " + propId);
+//		System.out.println("propertyChanged1:" + source.toString() + "  " + propId);
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		// TODO Auto-generated method stub
-		System.out.println("propertyChanged2");
-		 System.out.println("OldValue:"+event.getOldValue());  
-         System.out.println("NewValue:"+event.getNewValue());  
-         System.out.println("tPropertyName:"+event.getProperty());  
+//		System.out.println("propertyChanged2");
+//		 System.out.println("OldValue:"+event.getOldValue());  
+//         System.out.println("NewValue:"+event.getNewValue());  
+//         System.out.println("tPropertyName:"+event.getProperty());  
 	}
 
 }
