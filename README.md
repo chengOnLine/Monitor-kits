@@ -1,2 +1,2 @@
 # Monitor-kits
-一个用于辅助和提高学生编程能力的Eclipse插件
+记录编程过程的Eclipse插件
