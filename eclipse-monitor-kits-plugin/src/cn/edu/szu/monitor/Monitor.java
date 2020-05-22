@@ -43,7 +43,6 @@ import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -74,7 +73,6 @@ import cn.edu.szu.listener.CustomSelectionListener;
 import cn.edu.szu.listener.CustomTextEditorListener;
 import cn.edu.szu.listener.CustomWindowListener;
 import cn.edu.szu.listener.CustomWorkbenchListener;
-import cn.edu.szu.translator.view.QueryDialog;
 import cn.edu.szu.util.ConnectionUtil;
 import cn.edu.szu.util.CreateFileUtil;
 import cn.edu.szu.util.ReadWriteFileUtil;
@@ -165,7 +163,7 @@ public class Monitor extends AbstractUIPlugin implements IStartup{
 							if(user.isLogin() == true)
 								break;
 							String url = config.getSetting().getServerUrl()+":"+config.getSetting().getPort();
-							String result = ConnectionUtil.doGetLogin(url, user.getName(), user.getPassword());
+							String result = ConnectionUtil.doGetLogin(url, user.getName(),user.getStudentID(), user.getPassword());
 							if(result.equals("SUCCESS")) {
 								session.setUserName(user.getName());
 								user.setLogin(true);

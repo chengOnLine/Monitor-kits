@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +45,7 @@ import cn.edu.szu.monitor.Monitor;
 import cn.edu.szu.util.ConnectionUtil;
 import cn.edu.szu.util.Const;
 import cn.edu.szu.util.CreateFileUtil;
+import cn.edu.szu.util.CustomFileFilter2;
 import cn.edu.szu.util.CustomFileNameFilter;
 import cn.edu.szu.util.ReadWriteFileUtil;
 import cn.edu.szu.util.SWTResourceManager;
@@ -103,7 +106,7 @@ public class MonitorShell {
 //		shell.setBackgroundImage(Monitor.getImageDescriptor("C:\\Users\\10190\\Desktop\\time.jpg").createImage());
 		shell.setImage(null);
 		shell.setSize(750, 450);
-		shell.setText("\u76D1\u542C\u5668");
+		shell.setText("客户端（学生端）");
 		
 		statuLabel = new Label(shell, SWT.NONE);
 		statuLabel.setText("\u5F53\u524D\u72B6\u6001\uFF1A\u79BB\u7EBF");
@@ -218,9 +221,10 @@ public class MonitorShell {
 		group = new Group(shell, SWT.NONE);
 		group.setBounds(373, 250, 348, 117);
 		group.setText("\u64CD\u4F5C");
-		downloadBtn = new Button(group, SWT.NONE);
-		downloadBtn.setBounds(123, 22, 98, 30);
-		downloadBtn.setText("综合测评报告");
+		
+//		downloadBtn = new Button(group, SWT.NONE);
+//		downloadBtn.setBounds(123, 22, 98, 30);
+//		downloadBtn.setText("综合测评报告");
 		
 		lastDownloadLabel = new Label(group, SWT.NONE);
 		lastDownloadLabel.setBounds(10, 55, 328, 52);
@@ -240,28 +244,10 @@ public class MonitorShell {
 		verifyBtn.setBounds(26, 22, 76, 30);
 		verifyBtn.setText("\u9A8C\u8BC1\u5730\u5740");
 		
-		allProgramBtn = new Button(group, SWT.NONE);
-		allProgramBtn.setBounds(240, 22, 98, 30);
-		allProgramBtn.setText("历史编程记录");
-		
-		File file = new File(Const.sessionFileDir);
-		if(file.exists()) {
-			ArrayList<UploadRecord> urs = new ArrayList<UploadRecord>();
-			for(int i=0; i<file.list(new CustomFileNameFilter()).length;i++) {
-				String name = file.list()[i];
-				name = name.substring(0,name.lastIndexOf("."));
-				String[] strs = name.split("_");
-				if(strs[0].equals("unnamed"))
-					continue;
-				UploadRecord ur = new UploadRecord();
-				ur.setId(i+"");
-				ur.setUserName(strs[0]);
-				ur.setDate(strs[1]);
-				ur.setStatus(strs[2]);
-				urs.add(ur);
-			}
-			tableViewer.setInput(urs);
-		}
+//		allProgramBtn = new Button(group, SWT.NONE);
+//		allProgramBtn.setBounds(240, 22, 98, 30);
+//		allProgramBtn.setText("历史编程记录");
+
 		addButtonListener();
 	}
 	private void createTableViewer(Composite parent){
@@ -299,7 +285,9 @@ public class MonitorShell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if(loginBtn.getText().trim().equals("登录")) {
-					new LoginShell(monitorShell);
+//					new LoginShell(monitorShell);
+					Display display = Display.getDefault();
+					new Login(display,monitorShell);;
 				}else {
 					try {
 						Configuration config = ReadWriteFileUtil.readConfig();
@@ -404,20 +392,20 @@ public class MonitorShell {
 				}
 			}
 		});
-		allProgramBtn.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println("下载编程过程详情");
-				downloadFile("PROGRAMS");
-			}
-		});
-		downloadBtn.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println("下载综合测评报告");
-				downloadFile("REPORT");
-			}
-		});		
+//		allProgramBtn.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				System.out.println("下载编程过程详情");
+//				downloadFile("PROGRAMS");
+//			}
+//		});
+//		downloadBtn.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				System.out.println("下载综合测评报告");
+//				downloadFile("REPORT");
+//			}
+//		});		
 	}
 	public void downloadFile(String type) {
 		Configuration config;
@@ -427,9 +415,10 @@ public class MonitorShell {
 			if(user != null) {
 				if(user.isLogin()) {
 					String url = config.getSetting().getServerUrl() + ":" +config.getSetting().getPort();
-					String statu = ConnectionUtil.download(url, user.getName(),type);
+					String statu = ConnectionUtil.download(url, user.getName()+"_"+user.getStudentID(),type);
 					if(statu.equals("SUCCESS")) {
 						System.out.println("下载成功");
+						JOptionPane.showMessageDialog(null, "下载成功", "提示 ", JOptionPane.INFORMATION_MESSAGE);
 					}else {
 						JOptionPane.showMessageDialog(null, "下载失败", "错误 ", JOptionPane.ERROR_MESSAGE);
 					}
@@ -468,8 +457,57 @@ public class MonitorShell {
 		serverUrlText.setText(setting.getServerUrl());
 		serverPortText.setText(setting.getPort());
 		changeThemeColor(config.getSetting().getTheme());
-		
+		if(user.isLogin()) {
+			refreshTable(user.getName());
+		}else {
+			refreshTable("");
+		}
 		ReadWriteFileUtil.writeConfig(config);
+	}
+	public void refreshTable(String userName) {
+		if(userName == null)
+			return;
+		ArrayList<UploadRecord> urs = new ArrayList<UploadRecord>();
+		if(userName.equals("")) {
+			tableViewer.setInput(urs);
+		}
+		File file = new File(Const.sessionFileDir);
+		if(file.exists()) {
+			File files[] = file.listFiles(new CustomFileFilter2());
+			
+	        Arrays.sort(files, new Comparator<File>() {
+	            public int compare(File f1, File f2) {
+	                long diff = f1.lastModified() - f2.lastModified();
+	                if (diff > 0)
+	                    return 1;
+	                else if (diff == 0)
+	                    return 0;
+	                else
+	                    return -1;//如果 if 中修改为 返回-1 同时此处修改为返回 1  排序就会是递减
+	            }
+
+	            public boolean equals(Object obj) {
+	                return true;
+	            }
+
+	        });
+	        
+			for(int i=0; i<files.length;i++) {
+				File f = files[i];
+				String name = f.getName();
+				name = name.substring(0,name.lastIndexOf("."));
+				String[] strs = name.split("_");
+				if(strs[0].equals(userName)) {
+					UploadRecord ur = new UploadRecord();
+					ur.setId(i+"");
+					ur.setUserName(strs[0]);
+					ur.setDate(strs[1]);
+					ur.setStatus(strs[2]);
+					urs.add(ur);
+				}
+			}
+			tableViewer.setInput(urs);
+		}
 	}
 	public void changeThemeColor(String color) {
 		if(color == null || color.equals("")) return ;

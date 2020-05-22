@@ -91,69 +91,69 @@ public class LoginShell {
 		loginBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("正在尝试登录服务器");
-				String name = userNameText.getText().trim();
-				String password = passwordText.getText().trim();
-				if(name.equals("") || password.equals("")) {
-					JOptionPane.showMessageDialog(null, "用户名和密码不能为空", "错误 ", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if(!verifyName(name)) {
-					JOptionPane.showMessageDialog(null, "用户名不合法", "错误 ", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				Configuration config;
-				try {
-					config = ReadWriteFileUtil.readConfig();
-					if(config == null) return;
-					String url = config.getSetting().getServerUrl()+":"+config.getSetting().getPort();
-					String result = ConnectionUtil.doGetLogin(url, name, password);
-					System.out.println("result"+ result);
-					if(result.equals("SUCCESS")) {
-						try {
-							Monitor.session.setUserName(name);
-							config.setUser(new User(name,password,true));
-							monitorShell.refreshUIByConfig(config);
-						} catch (IOException ee) {
-							ee.printStackTrace();
-						}
-						shell.dispose();
-					}else {
-						JOptionPane.showMessageDialog(null, result , "登录异常", JOptionPane.INFORMATION_MESSAGE);
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+//				System.out.println("正在尝试登录服务器");
+//				String name = userNameText.getText().trim();
+//				String password = passwordText.getText().trim();
+//				if(name.equals("") || password.equals("")) {
+//					JOptionPane.showMessageDialog(null, "用户名和密码不能为空", "错误 ", JOptionPane.ERROR_MESSAGE);
+//					return;
+//				}
+//				if(!verifyName(name)) {
+//					JOptionPane.showMessageDialog(null, "用户名不合法", "错误 ", JOptionPane.ERROR_MESSAGE);
+//					return;
+//				}
+//				Configuration config;
+//				try {
+//					config = ReadWriteFileUtil.readConfig();
+//					if(config == null) return;
+//					String url = config.getSetting().getServerUrl()+":"+config.getSetting().getPort();
+////					String result = ConnectionUtil.doGetLogin(url, name, password);
+//					System.out.println("result"+ result);
+//					if(result.equals("SUCCESS")) {
+//						try {
+//							Monitor.session.setUserName(name);
+////							config.setUser(new User(name,password,true));
+//							monitorShell.refreshUIByConfig(config);
+//						} catch (IOException ee) {
+//							ee.printStackTrace();
+//						}
+//						shell.dispose();
+//					}else {
+//						JOptionPane.showMessageDialog(null, result , "登录异常", JOptionPane.INFORMATION_MESSAGE);
+//					}
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
 			}
 		});
 		registerBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("正在尝试注册");
-				String name = userNameText.getText().trim();
-				String password = passwordText.getText().trim();
-				if(name.equals("") || password.equals("")) {
-					JOptionPane.showMessageDialog(null, "用户名和密码不能为空", "错误 ", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if(!verifyName(name)) {
-					JOptionPane.showMessageDialog(null, "用户名不合法", "错误 ", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				Configuration config;
-				try {
-					config = ReadWriteFileUtil.readConfig();
-					if(config == null) return;
-					String url = config.getSetting().getServerUrl()+":"+config.getSetting().getPort();
-					String result = ConnectionUtil.doGetRegister(url, name, password);
-					if(result.equals("SUCCESS")) {
-						JOptionPane.showMessageDialog(null, "注册成功");
-					}else {
-						JOptionPane.showMessageDialog(null, result , "注册异常", JOptionPane.INFORMATION_MESSAGE);
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+//				System.out.println("正在尝试注册");
+//				String name = userNameText.getText().trim();
+//				String password = passwordText.getText().trim();
+//				if(name.equals("") || password.equals("")) {
+//					JOptionPane.showMessageDialog(null, "用户名和密码不能为空", "错误 ", JOptionPane.ERROR_MESSAGE);
+//					return;
+//				}
+//				if(!verifyName(name)) {
+//					JOptionPane.showMessageDialog(null, "用户名不合法", "错误 ", JOptionPane.ERROR_MESSAGE);
+//					return;
+//				}
+//				Configuration config;
+//				try {
+//					config = ReadWriteFileUtil.readConfig();
+//					if(config == null) return;
+//					String url = config.getSetting().getServerUrl()+":"+config.getSetting().getPort();
+//					String result = ConnectionUtil.doGetRegister(url, name, password);
+//					if(result.equals("SUCCESS")) {
+//						JOptionPane.showMessageDialog(null, "注册成功");
+//					}else {
+//						JOptionPane.showMessageDialog(null, result , "注册异常", JOptionPane.INFORMATION_MESSAGE);
+//					}
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
 			}
 		});
 	}

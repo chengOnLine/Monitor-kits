@@ -42,7 +42,7 @@ public class CustomWorkbenchListener implements IWindowListener, IWorkbenchListe
 			session.setSessionTime( (session.getEndTime().getTime()-session.getStartTime().getTime()));
 		
 		String fileName = "";
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH时mm分ss秒");
 		if(session.getUserName().equals("")) {
 			fileName = "unnamed"+"_"+dateFormat.format(new Date());
 		}else {
@@ -66,15 +66,15 @@ public class CustomWorkbenchListener implements IWindowListener, IWorkbenchListe
 					if(user!=null) {
 						if(user.isLogin() && config.getSetting().isAutoUpload()) {
 							String url = config.getSetting().getServerUrl() +":"+ config.getSetting().getPort();
-							String result = ConnectionUtil.doPostWithFile(url, path, user.getName());
+							String result = ConnectionUtil.doPostWithFile(url, path, user.getName()+"_"+user.getStudentID());
 							if(result.equals("SUCCESS")) {
 								System.out.println("上传结果："+ result);
-								String newName = oldName + "_" + "UPLOADED" + ext;
+								String newName = oldName + "_" + "SUCCESS" + ext;
 								ReadWriteFileUtil.renameFile(file,newName);
 								Monitor.session.getLogger().push(new RecordEntity("Upload,Success",1,"上传监控文件成功!",""));
 							}else {
 								System.out.println("上传结果："+ result);
-								String newName = oldName + "_" + "ERROR" + ext;
+								String newName = oldName + "_" + "FAILURE" + ext;
 								ReadWriteFileUtil.renameFile(file,newName);
 								Monitor.session.getLogger().push(new RecordEntity("Upload,Error",1,"上传监控文件失败!",""));
 							}

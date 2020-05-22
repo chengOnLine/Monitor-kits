@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,11 +27,11 @@ import cn.edu.szu.config.Configuration;
 public class ConnectionUtil {
 //	private static String host = "http://192.168.182.1:8080";
 
-	public static String doGetLogin(String url , String name , String password) {
+	public static String doGetLogin(String url , String name ,String id, String password) {
 		String result="";
 		try {
-			String params = "?name="+name+"&password="+password;
-			URL realurl = new URL(url+"/login"+params);
+			String params = "?name="+name+"&id="+id+"&password="+password;
+			URL realurl = new URL(url+"/login"+params  );
 			HttpURLConnection connection = (HttpURLConnection) realurl.openConnection(); 
 		    // 返回结果-字节输入流转换成字符输入流，控制台输出字符
 	        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -47,10 +48,10 @@ public class ConnectionUtil {
 		}
 	}
 	
-	public static String doGetRegister(String url , String name , String password) {
+	public static String doGetRegister(String url , String name ,String id, String password) {
 		String result="";
 		try {
-			String params = "?name="+name+"&password="+password;
+			String params = "?name="+name+"&id="+id+"&password="+password;
 			URL realurl = new URL(url+"/register"+params);
 			HttpURLConnection connection = (HttpURLConnection) realurl.openConnection(); 
 		    // 返回结果-字节输入流转换成字符输入流，控制台输出字符
@@ -231,9 +232,9 @@ public class ConnectionUtil {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
 		    String fileName = dateFormat.format(new Date()) + ".txt";
 			if(type.equals("REPORT")) {
-				fileName = "综合测评报告_"+dateFormat.format(new Date())+".txt";
+				fileName = userName+"_综合测评报告_"+dateFormat.format(new Date())+".txt";
 			}else if(type.equals("PROGRAMS")){
-				fileName = "历史编程记录_"+dateFormat.format(new Date())+".txt";
+				fileName = userName+"_历史编程记录_"+dateFormat.format(new Date())+".txt";
 			}
 
 		    File file = new File(saveDir+File.separator+fileName);
